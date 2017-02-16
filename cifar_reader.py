@@ -36,7 +36,7 @@ def read_cifar():
 	# clear som ram
 	del X1, X2, X3, X4, X5
 
-	#one-hot encode labels
+	# class labels
 	y1 = np.array(data1['labels'])
 	y2 = np.array(data2['labels'])
 	y3 = np.array(data3['labels'])
@@ -63,6 +63,7 @@ def preprocess_dataset(X, y):
 	X[:,:,:,1] = (X[:,:,:,1] - g_mean_X)/g_std_X
 	X[:,:,:,2] = (X[:,:,:,2] - b_mean_X)/b_std_X
 	
+	# one-hot encode labels
 	N_images = X.shape[0]
 	Y = np.zeros((N_images, 10))
 	Y[np.arange(N_images), y] = 1
