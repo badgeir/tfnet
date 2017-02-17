@@ -44,7 +44,7 @@ def run():
 		random_idx = np.random.choice(np.arange(X_val.shape[0]), size=512, replace=False)
 		x_batch = X_val[random_idx]
 		y_batch = y_val[random_idx]
-		print(network.accuracy(x_batch, y_batch))
+		print(network.accuracy(feed_dict={network.x: x_batch, network.y_: y_batch, network.dropout: 1.}))
 
 		for i in range(int(X_train.shape[0]/batch_size)):
 			# next batch
@@ -54,7 +54,7 @@ def run():
 			y_batch = y_train[i*batch_size : i*batch_size+batch_size]
 
 			# update weights
-			network.train_batch(x_batch, y_batch)
+			network.train_batch(feed_dict={network.x: x_batch, network.y_: y_batch, network.dropout: 0.5})
 
 	network.end_session()
 

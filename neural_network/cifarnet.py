@@ -5,9 +5,15 @@ import tensorflow as tf
 
 class CifarNet(NeuralNetwork):
 	def __init__(self):
-		NeuralNetwork.__init__(self)
+		x_shape = [None, 32, 32, 3]
+		y_shape = [None, 10]
+		NeuralNetwork.__init__(self, x_shape, y_shape)
 
-	def network_definition(self):
+	def define_hyperparams(self):
+		self.dropout = tf.placeholder(tf.float32, name='dropout')
+		self._learning_rate = tf.Variable(1e-3)
+
+	def define_network(self):
 		layer1 = conv_bn_relu(self.x, [7, 7, 3, 32], 'C1')
 		layer2 = conv_bn_relu(layer1, [5, 5, 32, 32], 'C2')
 		layer3 = max_pool_2x2(layer2)
@@ -19,15 +25,20 @@ class CifarNet(NeuralNetwork):
 		layer7 = flatten(layer6, [-1, 8*8*64])
 		
 		layer8 = fc_bn_relu(layer7, [8*8*64, 512], 'FC1')
-		self.dropout_keep_prob = tf.placeholder(tf.float32)
-		layer9 = dropout(layer8, self.dropout_keep_prob)
+		layer9 = dropout(layer8, self.dropout)
 
 		layer10 = fc_bn_relu(layer9, [512, 10], 'Y')
 		return layer10
 
-	def loss_definition(self):
+	def define_loss(self):
 		return tf.reduce_mean(
 			tf.nn.softmax_cross_entropy_with_logits(self._network, self.y_))
 
-	def optimizer_definition(self):
+	def define_optimizer(self):
 		return tf.train.AdamOptimizer(self._learning_rate).minimize(self._loss)
+
+	def set_learning_rate(self, lr):
+		if self._session_running:
+			self._session.run(self._learning_rate.assign(lr))
+		else:
+			print('learning rate can only be assigned in a running session.')
