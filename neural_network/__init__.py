@@ -1,1 +1,1 @@
-from neural_network.cifarnet import CifarNet
+from neural_network.base_network import NeuralNetwork

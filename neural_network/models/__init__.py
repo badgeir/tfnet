@@ -1,0 +1,1 @@
+from neural_network.models.cifarnet import CifarNet
