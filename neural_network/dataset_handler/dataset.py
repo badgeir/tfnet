@@ -13,14 +13,41 @@ class Dataset(object):
 		self.X_train, self.Y_train, self.X_val, self.Y_val,\
 			self.X_test, self.Y_test = train_val_test_split(X, Y, test_size=test_size, val_size=val_size)
 
+		self._batch_size = 32
 		self._current_idx = 0
 
-	def _shuffle():
-		random_idx = np.arange(X.shape[0])
+	def _shuffle_training_data(self):
+		random_idx = np.arange(self.X_train.shape[0])
 		np.random.shuffle(random_idx)
 
-		self.X = self.X[random_idx]
-		self.Y = self.Y[random_idx]
+		self.X_train = self.X_train[random_idx]
+		self.Y_train = self.Y_train[random_idx]
 
-	def next_batch(self, batch_size):
-		raise NotImplementedError
+	def set_batch_size(self, batch_size):
+		self._batch_size = batch_size
+		self._current_idx = 0
+
+	def next_training_batch(self):
+		if self._current_idx == 0:
+			self._shuffle_training_data()
+
+		epoch_done = False
+
+		x_batch = self.X_train[range(self._current_idx, self._current_idx+self._batch_size)]
+		y_batch = self.Y_train[range(self._current_idx, self._current_idx+self._batch_size)]
+		
+
+		self._current_idx += self._batch_size
+		if self._current_idx + self._batch_size >= self.X_train.shape[0]:
+			epoch_done = True
+			self._current_idx = 0
+
+		return epoch_done, x_batch, y_batch
+
+	def validation_batch(self, batch_size):
+		random_idx = np.random.choice(np.arange(self.X_val.shape[0]), batch_size, replace=False)
+		return self.X_val[random_idx], self.Y_val[random_idx]
+
+	def test_batch(self, batch_size):
+		random_idx = np.random.choice(np.arange(self.X_test.shape[0]), batch_size, replace=False)
+		return self.X_test[random_idx], self.Y_test[random_idx]
