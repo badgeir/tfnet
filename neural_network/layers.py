@@ -17,6 +17,7 @@ def max_pool_2x2(x):
 	return tf.nn.max_pool(x, ksize=[1,2,2,1],
 						  strides=[1,2,2,1], padding='SAME')
 
+# convolution + batch normalization + relu layer
 def conv_bn_relu(x, w_shape, name):
 	W = _weight_variable(w_shape, 'W_%s'%name)
 	b = _bias_variable([w_shape[3]], 'bias_%s'%name)
@@ -27,6 +28,7 @@ def conv_bn_relu(x, w_shape, name):
 def flatten(x, shape):
 	return tf.reshape(x, shape)
 
+# fully connected + batch normalization + relu layer
 def fc_bn_relu(x, w_shape, name):
 	W = _weight_variable(w_shape, 'W_%s'%name)
 	b = _bias_variable([w_shape[1]], 'bias_%s'%name)
