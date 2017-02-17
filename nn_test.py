@@ -1,24 +1,9 @@
 
-from sklearn.model_selection import train_test_split
 import numpy as np
 import tensorflow as tf
 
 import cifar_reader
 import neural_network
-
-def shuffle_dataset(X, Y):
-	random_idx = np.arange(X.shape[0])
-	np.random.shuffle(random_idx)
-
-	X = X[random_idx]
-	Y = Y[random_idx]
-
-	return X, Y
-
-def train_val_test_split(X, y):
-		X, X_test, y, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
-		X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2)
-		return X_train, y_train, X_val, y_val, X_test, y_test
 
 def run():	
 	#read untared cifar dataset from folder ./dataset and preprocess images and labels
@@ -46,7 +31,13 @@ def run():
 		y_batch = y_val[random_idx]
 		print(network.accuracy(feed_dict={network.x: x_batch, network.y_: y_batch, network.dropout: 1.}))
 
+		if epoch%4==3:
+			lr = network.learning_rate
+			print('setting learning rate to %f.'%(lr/10))
+			network.set_learning_rate(lr/10)
+
 		for i in range(int(X_train.shape[0]/batch_size)):
+				
 			# next batch
 			x_batch = X_train[i*batch_size : i*batch_size+batch_size]
 			# add image noise

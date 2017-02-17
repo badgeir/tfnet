@@ -42,3 +42,11 @@ class CifarNet(NeuralNetwork):
 			self._session.run(self._learning_rate.assign(lr))
 		else:
 			print('learning rate can only be assigned in a running session.')
+	
+	@property
+	def learning_rate(self):
+		if self._session_running:
+			return self._session.run(self._learning_rate)
+		else:
+			print('learning rate can only be evaluated in session.')
+			return None
