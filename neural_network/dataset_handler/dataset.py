@@ -44,6 +44,10 @@ class Dataset(object):
 
 		return epoch_done, x_batch, y_batch
 
+	def training_batch(self, set_batch_size):
+		random_idx = np.random.choice(np.arange(self.X_train.shape[0]), batch_size, replace=False)
+		return self.X_train[random_idx], self.Y_train[random_idx]
+
 	def validation_batch(self, batch_size):
 		random_idx = np.random.choice(np.arange(self.X_val.shape[0]), batch_size, replace=False)
 		return self.X_val[random_idx], self.Y_val[random_idx]

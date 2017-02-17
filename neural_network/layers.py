@@ -29,7 +29,7 @@ def flatten(x, shape):
 
 def fc_bn_relu(x, w_shape, name):
 	W = _weight_variable(w_shape, 'W_%s'%name)
-	b = _bias_variable([w_shape[1]], 'b_%s'%name)
+	b = _bias_variable([w_shape[1]], 'bias_%s'%name)
 	z = tf.matmul(x, W) + b
 	mean, var = tf.nn.moments(z, [0])
 	return tf.nn.relu( tf.nn.batch_normalization(z, mean, var, 0, 1, 1e-6) )

@@ -6,9 +6,6 @@ from neural_network.layers import conv_bn_relu, max_pool_2x2, flatten, fc_bn_rel
 
 class NeuralNetwork(object):
 	def __init__(self, x_shape, y_shape):
-		self.weight_variables = []
-		self.bias_variables = []
-
 		self.x = tf.placeholder(tf.float32, shape=x_shape, name='x')
 		self.y_ = tf.placeholder(tf.float32, shape=y_shape, name='y_')
 
@@ -61,6 +58,9 @@ class NeuralNetwork(object):
 
 	def accuracy(self, feed_dict={}):
 		return self._session.run(self._accuracy, feed_dict=feed_dict)
+
+	def loss(self, feed_dict={}):
+		return self._session.run(self._loss, feed_dict=feed_dict)
 
 	def network_definition(self):
 		raise NotImplementedError

@@ -11,7 +11,8 @@ class CifarNet(NeuralNetwork):
 
 	def define_hyperparams(self):
 		self.dropout = tf.placeholder(tf.float32, name='dropout')
-		self._learning_rate = tf.Variable(1e-3)
+		self._learning_rate = tf.Variable(1e-3, trainable=False)
+
 
 	def define_network(self):
 		layer1 = conv_bn_relu(self.x, [7, 7, 3, 32], 'C1')
@@ -21,7 +22,7 @@ class CifarNet(NeuralNetwork):
 		layer5 = conv_bn_relu(layer4, [5, 5, 64, 64], 'C4')
 		layer6 = max_pool_2x2(layer5)
 
-		# size of input is now N*8x8x64
+		# size of input is now Nx8x8x64
 		layer7 = flatten(layer6, [-1, 8*8*64])
 		
 		layer8 = fc_bn_relu(layer7, [8*8*64, 512], 'FC1')
@@ -31,8 +32,13 @@ class CifarNet(NeuralNetwork):
 		return layer10
 
 	def define_loss(self):
-		return tf.reduce_mean(
+		loss = tf.reduce_mean(
 			tf.nn.softmax_cross_entropy_with_logits(self._network, self.y_))
+		# add l2 regularization loss
+		for t in tf.trainable_variables():
+			if 'bias' not in t.name:
+				loss += tf.nn.l2_loss(t)*1e-5
+		return loss
 
 	def define_optimizer(self):
 		return tf.train.AdamOptimizer(self._learning_rate).minimize(self._loss)
