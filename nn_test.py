@@ -10,7 +10,7 @@ def run():
 	#read untared cifar dataset from folder ./dataset and preprocess images and labels
 	X, Y = cifar_reader.read_and_preprocess()
 
-	dataset = Dataset(X, Y)
+	dataset = Dataset(X, Y, test_size=0.1, val_size=0.2)
 	del X, Y
 
 	# build convolutional neural network
