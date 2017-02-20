@@ -17,7 +17,6 @@ def run():
 	network = CifarNet()
 	
 	n_epochs = 10
-	dataset.set_batch_size(128)
 
 	network.start_session()
 	network.set_learning_rate(0.01)
@@ -26,8 +25,8 @@ def run():
 		x_batch, y_batch = dataset.validation_batch(1024)
 		val_acc = network.accuracy(feed_dict={network.x: x_batch, network.y_: y_batch, network.dropout: 1.})
 		val_loss = network.loss(feed_dict={network.x: x_batch, network.y_: y_batch, network.dropout: 1.})
-		# test accuracy on validation training
-		x_batch, y_batch = dataset.validation_batch(1024)
+		# test accuracy on training batch
+		x_batch, y_batch = dataset.training_batch(1024)
 		train_acc = network.accuracy(feed_dict={network.x: x_batch, network.y_: y_batch, network.dropout: 1.})
 		train_loss = network.loss(feed_dict={network.x: x_batch, network.y_: y_batch, network.dropout: 1.})
 		
@@ -38,10 +37,7 @@ def run():
 			print('setting learning rate from %f to %f.'%(lr, lr/10.))
 			network.set_learning_rate(lr/10.)
 
-		epoch_done = False
-		while not epoch_done:
-			# next batch
-			epoch_done, x_batch, y_batch = dataset.next_training_batch()
+		for x_batch, y_batch in dataset.batch_until_epoch(batch_size=128):
 			# add image noise
 			x_batch += np.random.normal(x_batch)*0.001
 			# update weights

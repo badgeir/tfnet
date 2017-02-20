@@ -7,14 +7,12 @@ def train_val_test_split(X, y, test_size=0.1, val_size=0.2):
 		X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=val_size)
 		return X_train, y_train, X_val, y_val, X_test, y_test
 
+
 class Dataset(object):
 	def __init__(self, X, Y, test_size=0.1, val_size=0.2):
 		# split dataset into train, test and validation sets
 		self.X_train, self.Y_train, self.X_val, self.Y_val,\
 			self.X_test, self.Y_test = train_val_test_split(X, Y, test_size=test_size, val_size=val_size)
-
-		self._batch_size = 32
-		self._current_idx = 0
 
 	def _shuffle_training_data(self):
 		random_idx = np.arange(self.X_train.shape[0])
@@ -23,28 +21,17 @@ class Dataset(object):
 		self.X_train = self.X_train[random_idx]
 		self.Y_train = self.Y_train[random_idx]
 
-	def set_batch_size(self, batch_size):
-		self._batch_size = batch_size
-		self._current_idx = 0
+	def batch_until_epoch(self, batch_size=32):
+		self._shuffle_training_data()
 
-	def next_training_batch(self):
-		if self._current_idx == 0:
-			self._shuffle_training_data()
+		current_idx = 0
+		while current_idx + batch_size <= self.X_train.shape[0]:
+			x_batch = self.X_train[range(current_idx, current_idx + batch_size)]
+			y_batch = self.Y_train[range(current_idx, current_idx + batch_size)]
+			yield x_batch, y_batch
+			current_idx += batch_size
 
-		epoch_done = False
-
-		x_batch = self.X_train[range(self._current_idx, self._current_idx+self._batch_size)]
-		y_batch = self.Y_train[range(self._current_idx, self._current_idx+self._batch_size)]
-		
-
-		self._current_idx += self._batch_size
-		if self._current_idx + self._batch_size >= self.X_train.shape[0]:
-			epoch_done = True
-			self._current_idx = 0
-
-		return epoch_done, x_batch, y_batch
-
-	def training_batch(self, set_batch_size):
+	def training_batch(self, batch_size):
 		random_idx = np.random.choice(np.arange(self.X_train.shape[0]), batch_size, replace=False)
 		return self.X_train[random_idx], self.Y_train[random_idx]
 
