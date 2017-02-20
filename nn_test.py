@@ -16,32 +16,40 @@ def run():
 	# build convolutional neural network
 	network = CifarNet()
 	
-	n_epochs = 10
+	n_epochs = 100
+	
+	train_loss_log = []
 
 	network.start_session()
-	network.set_learning_rate(0.01)
+	network.set_learning_rate(0.001)
 	for epoch in range(n_epochs):		
 		# test accuracy on validation batch
 		x_batch, y_batch = dataset.validation_batch(1024)
-		val_acc = network.accuracy(feed_dict={network.x: x_batch, network.y_: y_batch, network.dropout: 1.})
-		val_loss = network.loss(feed_dict={network.x: x_batch, network.y_: y_batch, network.dropout: 1.})
-		# test accuracy on training batch
-		x_batch, y_batch = dataset.training_batch(1024)
-		train_acc = network.accuracy(feed_dict={network.x: x_batch, network.y_: y_batch, network.dropout: 1.})
-		train_loss = network.loss(feed_dict={network.x: x_batch, network.y_: y_batch, network.dropout: 1.})
+		val_loss, val_acc = network.validate_batch(feed_dict={network.x: x_batch, network.y_: y_batch, network.dropout: 1.})
 		
-		print('train acc/loss: %f/%f, val acc/loss: %f/%f'%(train_acc, train_loss, val_acc, val_loss))
+		if epoch > 0:
+			print('train acc/loss: %f/%f, val acc/loss: %f/%f'%(train_acc, train_loss_log[-1], val_acc, val_loss))
 
-		if epoch%4==3:
-			lr = network.learning_rate
-			print('setting learning rate from %f to %f.'%(lr, lr/10.))
-			network.set_learning_rate(lr/10.)
+		if len(train_loss_log) > 1:
+			# reduce learning rate if training is stagnating
+			if train_loss_log[-1] > train_loss_log[-2]:
+				lr = network.learning_rate
+				print('setting learning rate from %f to %f.'%(lr, lr/10.))
+				network.set_learning_rate(lr/10.)
+				network.save(epoch)
 
+		accu_loss, accu_acc, n_batches = 0., 0., 0
 		for x_batch, y_batch in dataset.batch_until_epoch(batch_size=128):
-			# add image noise
 			x_batch += np.random.normal(x_batch)*0.001
-			# update weights
-			network.train_batch(feed_dict={network.x: x_batch, network.y_: y_batch, network.dropout: 0.5})
+			# batch update weights
+			batch_loss, batch_acc = network.train_batch(feed_dict={network.x: x_batch, network.y_: y_batch, network.dropout: 0.5})
+			accu_loss += batch_loss
+			accu_acc += batch_acc
+			n_batches += 1
+
+		train_loss_log.append(accu_loss/n_batches)
+		train_acc = accu_acc / n_batches
+
 	network.end_session()
 
 if __name__=='__main__':

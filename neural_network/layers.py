@@ -29,6 +29,11 @@ def flatten(x, shape):
 	return tf.reshape(x, shape)
 
 # fully connected + batch normalization + relu layer
+def linear(x, w_shape, name):
+	W = _weight_variable(w_shape, 'W_%s'%name)
+	b = _bias_variable([w_shape[1]], 'bias_%s'%name)
+	return tf.matmul(x, W) + b
+
 def fc_bn_relu(x, w_shape, name):
 	W = _weight_variable(w_shape, 'W_%s'%name)
 	b = _bias_variable([w_shape[1]], 'bias_%s'%name)

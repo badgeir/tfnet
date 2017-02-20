@@ -1,5 +1,7 @@
 *.pyc
 checkpoint
-*.cpkt.*
+*ckpt*
 *.pyproj
 dataset
+saved_models
+logdir
