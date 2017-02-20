@@ -32,7 +32,7 @@ def run():
 
 		if len(train_loss_log) > 1:
 			# reduce learning rate if training is stagnating
-			if train_loss_log[-1] > train_loss_log[-2]:
+			if abs(train_loss_log[-1] - train_loss_log[-2]) < train_loss_log[-1]*0.03:
 				lr = network.learning_rate
 				print('setting learning rate from %f to %f.'%(lr, lr/10.))
 				network.set_learning_rate(lr/10.)
