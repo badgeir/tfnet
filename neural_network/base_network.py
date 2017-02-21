@@ -65,6 +65,9 @@ class NeuralNetwork(object):
 		
 		self._session.run(tf.global_variables_initializer())
 
+	def load_parameters(self, path):
+		self._saver.restore(self._session, path)
+
 	def end_session(self):
 		self._session.close()
 		self._session_running = False

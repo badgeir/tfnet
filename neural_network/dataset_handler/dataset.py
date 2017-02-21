@@ -31,6 +31,14 @@ class Dataset(object):
 			yield x_batch, y_batch
 			current_idx += batch_size
 
+	def training_epoch(self, batch_size=32):
+		current_idx = 0
+		while current_idx + batch_size <= self.X_test.shape[0]:
+			x_batch = self.X_test[range(current_idx, current_idx + batch_size)]
+			y_batch = self.Y_test[range(current_idx, current_idx + batch_size)]
+			yield x_batch, y_batch
+			current_idx += batch_size
+
 	def training_batch(self, batch_size):
 		random_idx = np.random.choice(np.arange(self.X_train.shape[0]), batch_size, replace=False)
 		return self.X_train[random_idx], self.Y_train[random_idx]
