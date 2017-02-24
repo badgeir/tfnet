@@ -3,8 +3,8 @@ import numpy as np
 import tensorflow as tf
 
 import cifar_reader
-from neural_network.models import CifarNet
-from neural_network.dataset_handler import Dataset
+from tfnet.models import CifarNet
+from tfnet.dataset_handler import Dataset
 
 def run():	
 	#read untared cifar dataset from folder ./dataset and preprocess images and labels
@@ -21,7 +21,8 @@ def run():
 	train_loss_log = []
 
 	network.start_session()
-	network.load_parameters('saved_models/cifarnet.ckpt-1337')
+	# uncomment and rewrite filename to load parameters
+	# network.load_parameters('saved_models/cifarnet.ckpt-1337')
 
 	learning_rate = 0.00001
 	network.set_learning_rate(learning_rate)
@@ -59,6 +60,7 @@ def run():
 
 		train_loss_log.append(accu_loss/n_batches)
 		train_acc = accu_acc / n_batches
+		print('training accuracy: %f'%train_acc)
 	
 	# test accuracy
 	correct_predictions, total = 0, 0

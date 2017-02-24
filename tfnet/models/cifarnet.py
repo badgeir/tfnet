@@ -1,5 +1,5 @@
-from neural_network.base_network import NeuralNetwork
-from neural_network.layers import max_pool_2x2, conv_bn_relu, flatten, fc_bn_relu, dropout, linear
+from tfnet.base_network import NeuralNetwork
+from tfnet.layers import max_pool_2x2, conv_bn_relu, flatten, fc_bn_relu, dropout, linear
 
 import tensorflow as tf
 

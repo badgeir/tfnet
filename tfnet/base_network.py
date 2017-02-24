@@ -3,7 +3,7 @@ import numpy as np
 import tensorflow as tf
 import os
 
-from neural_network.layers import conv_bn_relu, max_pool_2x2, flatten, fc_bn_relu, dropout
+from tfnet.layers import conv_bn_relu, max_pool_2x2, flatten, fc_bn_relu, dropout
 
 class NeuralNetwork(object):
 	def __init__(self, x_shape, y_shape, name='default_name'):
