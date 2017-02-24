@@ -25,27 +25,34 @@ def run():
 
 	learning_rate = 0.00001
 	network.set_learning_rate(learning_rate)
-	for epoch in range(n_epochs):		
-		# test accuracy on validation batch
-		x_batch, y_batch = dataset.validation_batch(1024)
-		val_loss, val_acc = network.validate_batch(feed_dict={network.x: x_batch, network.y_: y_batch, network.dropout: 1.})
 
-		if epoch > 0:
-			network.save(epoch)
+	# start training
+	for epoch in range(n_epochs):		
+
+		if epoch > 0 and epoch % 5 == 0:
+			# test accuracy on validation batch
+			correct_predictions, total = 0, 0
+			for x_batch, y_batch in dataset.validation_epoch(batch_size=100):
+				correct_predictions += network.correct_predictions(feed_dict={network.x: x_batch, network.y_: y_batch, network.dropout: 1.})
+				total += 100
+			val_accuracy = float(correct_predictions) / total
+			print('\n\nvalidation accuracy: %f\n\n'%val_accuracy)
+
 			print('train acc/loss: %f/%f, val acc/loss: %f/%f'%(train_acc, train_loss_log[-1], val_acc, val_loss))
+			network.save(epoch)
 
 		if len(train_loss_log) > 1:
-			# reduce learning rate if training is stagnating
+			# reduce learning rate if training is plateauing
 			if train_loss_log[-2] - train_loss_log[-1] < train_loss_log[-1]*learning_rate*40:
 				print('setting learning rate from %f to %f.'%(learning_rate, learning_rate/10.))
 				learning_rate = learning_rate/10.
 				network.set_learning_rate(learning_rate)
 
 		accu_loss, accu_acc, n_batches = 0., 0., 0
-		for x_batch, y_batch in dataset.batch_until_epoch(batch_size=128):
+		for x_batch, y_batch in dataset.training_epoch(batch_size=128):
 			x_batch += np.random.normal(x_batch)*0.001
 			# batch update weights
-			batch_loss, batch_acc = network.train_batch(feed_dict={network.x: x_batch, network.y_: y_batch, network.dropout: 0.8})
+			batch_loss, batch_acc = network.train_batch(feed_dict={network.x: x_batch, network.y_: y_batch, network.dropout: 0.7})
 			accu_loss += batch_loss
 			accu_acc += batch_acc
 			n_batches += 1
@@ -54,14 +61,12 @@ def run():
 		train_acc = accu_acc / n_batches
 	
 	# test accuracy
-	accu_loss, accu_acc, n_batches = 0, 0, 0
-	for x_batch, y_batch in dataset.training_epoch(batch_size=100):
-		test_loss, test_acc = network.validate_batch(feed_dict={network.x: x_batch, network.y_: y_batch, network.dropout: 1.})
-		accu_loss += test_loss
-		accu_acc += test_acc
-		n_batches += 1
-	acc = accu_acc / n_batches
-	print('\n\ntest accuracy: %f\n\n'%acc)
+	correct_predictions, total = 0, 0
+	for x_batch, y_batch in dataset.test_epoch(batch_size=100):
+		correct_predictions += network.correct_predictions(feed_dict={network.x: x_batch, network.y_: y_batch, network.dropout: 1.})
+		total += 100
+	test_accuracy = float(correct_predictions) / total
+	print('\n\ntest accuracy: %f\n\n'%test_accuracy)
 
 	network.end_session()
 

@@ -21,7 +21,7 @@ class Dataset(object):
 		self.X_train = self.X_train[random_idx]
 		self.Y_train = self.Y_train[random_idx]
 
-	def batch_until_epoch(self, batch_size=32):
+	def training_epoch(self, batch_size=32):
 		self._shuffle_training_data()
 
 		current_idx = 0
@@ -31,7 +31,15 @@ class Dataset(object):
 			yield x_batch, y_batch
 			current_idx += batch_size
 
-	def training_epoch(self, batch_size=32):
+	def validation_epoch(self, batch_size=32):
+		current_idx = 0
+		while current_idx + batch_size <= self.X_val.shape[0]:
+			x_batch = self.X_val[range(current_idx, current_idx + batch_size)]
+			y_batch = self.Y_val[range(current_idx, current_idx + batch_size)]
+			yield x_batch, y_batch
+			current_idx += batch_size
+
+	def test_epoch(self, batch_size=32):
 		current_idx = 0
 		while current_idx + batch_size <= self.X_test.shape[0]:
 			x_batch = self.X_test[range(current_idx, current_idx + batch_size)]

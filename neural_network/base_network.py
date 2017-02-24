@@ -49,7 +49,7 @@ class NeuralNetwork(object):
 		
 		correct_prediction = tf.equal(tf.argmax(self._network, 1), tf.argmax(self.y_, 1))
 		self._accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-
+		self._correct_predictions = tf.reduce_sum(tf.cast(correct_prediction, tf.int32))
 		# tensorboard summaries
 		tf.summary.scalar('loss', self._loss)
 		tf.summary.scalar('accuracy', self._accuracy)
@@ -85,6 +85,9 @@ class NeuralNetwork(object):
 
 	def predict(self, feed_dict={}):
 		return self._session.run(self._network, feed_dict=feed_dict)
+
+	def correct_predictions(self, feed_dict={}):
+		return self._session.run(self._correct_predictions, feed_dict=feed_dict)
 
 	def accuracy(self, feed_dict={}):
 		return self._session.run(self._accuracy, feed_dict=feed_dict)
