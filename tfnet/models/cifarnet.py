@@ -13,7 +13,6 @@ class CifarNet(NeuralNetwork):
 		self.dropout = tf.placeholder(tf.float32, name='dropout')
 		self._learning_rate = tf.Variable(1e-3, trainable=False)
 
-
 	def define_network(self):
 		conv_1_1 = conv_bn_relu(self.x, [3, 3, 3, 64], 'C_1_1')
 		drop_1 = dropout(conv_1_1, self.dropout)
@@ -57,7 +56,7 @@ class CifarNet(NeuralNetwork):
 
 	def define_loss(self):
 		loss = tf.reduce_mean(
-			tf.nn.softmax_cross_entropy_with_logits(self._network, self.y_))
+			tf.nn.softmax_cross_entropy_with_logits(logits=self._network, labels=self.y_))
 		# add l2 regularization loss
 		for t in tf.trainable_variables():
 			if 'bias' not in t.name:

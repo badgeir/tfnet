@@ -15,17 +15,23 @@ def run():
 
 	# build convolutional neural network
 	network = CifarNet()
-	
 	n_epochs = 100
-	
 	train_loss_log = []
 
 	network.start_session()
 	# uncomment and rewrite filename to load parameters
-	# network.load_parameters('saved_models/cifarnet.ckpt-1337')
+	network.load_parameters('saved_models/cifarnet.ckpt-1337')
 
 	learning_rate = 0.00001
 	network.set_learning_rate(learning_rate)
+
+	# test accuracy before training
+	correct_predictions, total = 0, 0
+	for x_batch, y_batch in dataset.test_epoch(batch_size=100):
+		correct_predictions += network.correct_predictions(feed_dict={network.x: x_batch, network.y_: y_batch, network.dropout: 1.})
+		total += 100
+	test_accuracy = float(correct_predictions) / total
+	print('\n\ntest accuracy: %f\n\n'%test_accuracy)
 
 	# start training
 	for epoch in range(n_epochs):		
