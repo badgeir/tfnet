@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 def unpickle(filename):
 	import pickle
@@ -7,61 +8,41 @@ def unpickle(filename):
 	fo.close()
 	return dict
 
-def read_cifar():
-	data1 = unpickle('dataset/data_batch_1')
-	data2 = unpickle('dataset/data_batch_2')
-	data3 = unpickle('dataset/data_batch_3')
-	data4 = unpickle('dataset/data_batch_4')
-	data5 = unpickle('dataset/data_batch_5')
+def read_cifar(dir, filenames):
+	data = []
+	for file in filenames:
+		file_path = os.path.join(dir, file)
+		data.append(unpickle(file_path))
 
-	# reshape and rescale images
-	X1 = data1['data']
-	X1 = X1.reshape((-1, 32, 32, 3), order='F').transpose(0, 2, 1, 3).astype(np.float32)/255.
+	im_data = ()
+	label_data = ()
+	for x in data:
+		images = x['data']
+		images = images.reshape((-1, 32, 32, 3), order='F').transpose(0, 2, 1, 3).astype(np.float32)/255.
+		im_data = im_data + (images, )
 
-	X2 = data2['data']
-	X2 = X2.reshape((-1, 32, 32, 3), order='F').transpose(0, 2, 1, 3).astype(np.float32)/255.
-
-	X3 = data3['data']
-	X3 = X3.reshape((-1, 32, 32, 3), order='F').transpose(0, 2, 1, 3).astype(np.float32)/255.
-
-	X4 = data4['data']
-	X4 = X4.reshape((-1, 32, 32, 3), order='F').transpose(0, 2, 1, 3).astype(np.float32)/255.
-
-	X5 = data5['data']
-	X5 = X5.reshape((-1, 32, 32, 3), order='F').transpose(0, 2, 1, 3).astype(np.float32)/255.
-
-	# concatenate all sets into one matrix
-	X = np.concatenate((X1, X2, X3, X4, X5), axis=0)
-
-	# clear som ram
-	del X1, X2, X3, X4, X5
-
-	# class labels
-	y1 = np.array(data1['labels'])
-	y2 = np.array(data2['labels'])
-	y3 = np.array(data3['labels'])
-	y4 = np.array(data4['labels'])
-	y5 = np.array(data5['labels'])
-
-	y = np.concatenate((y1, y2, y3, y4, y5), axis=0)
+		label_data = label_data + (np.array(x['labels']), )
+	X = np.concatenate(im_data, axis=0)
+	y = np.concatenate(label_data, axis=0)
+	del images, im_data, label_data, data
 	
 	return X, y
 
 def preprocess_dataset(X, y):
-	# mean_X = X.mean()
-	r_mean_X = X[:,:,:,0].mean()
-	g_mean_X = X[:,:,:,1].mean()
-	b_mean_X = X[:,:,:,2].mean()
+	## mean_X = X.mean()
+	#r_mean_X = X[:,:,:,0].mean()
+	#g_mean_X = X[:,:,:,1].mean()
+	#b_mean_X = X[:,:,:,2].mean()
 	
-	#std_X = X.std()
-	r_std_X = X[:,:,:,0].std()
-	g_std_X = X[:,:,:,1].std()
-	b_std_X = X[:,:,:,2].std()
+	##std_X = X.std()
+	#r_std_X = X[:,:,:,0].std()
+	#g_std_X = X[:,:,:,1].std()
+	#b_std_X = X[:,:,:,2].std()
 	
-	#X = (X-mean_X)/std_X
-	X[:,:,:,0] = (X[:,:,:,0] - r_mean_X)/r_std_X
-	X[:,:,:,1] = (X[:,:,:,1] - g_mean_X)/g_std_X
-	X[:,:,:,2] = (X[:,:,:,2] - b_mean_X)/b_std_X
+	##X = (X-mean_X)/std_X
+	#X[:,:,:,0] = (X[:,:,:,0] - r_mean_X)/r_std_X
+	#X[:,:,:,1] = (X[:,:,:,1] - g_mean_X)/g_std_X
+	#X[:,:,:,2] = (X[:,:,:,2] - b_mean_X)/b_std_X
 	
 	# one-hot encode labels
 	N_images = X.shape[0]
@@ -75,6 +56,6 @@ def preprocess_dataset(X, y):
 
 	return X, Y
 
-def read_and_preprocess():
-	X, Y = read_cifar()
+def read_and_preprocess(dir, *filenames):
+	X, Y = read_cifar(dir, filenames)
 	return preprocess_dataset(X, Y)

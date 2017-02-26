@@ -1,1 +1,1 @@
-from tfnet.dataset_handler.dataset import Dataset
+from tfnet.dataset_handler.dataset import *

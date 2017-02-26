@@ -5,3 +5,4 @@ checkpoint
 dataset
 saved_models
 logdir
+__pycache__

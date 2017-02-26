@@ -4,59 +4,56 @@ import tensorflow as tf
 
 import cifar_reader
 from tfnet.models import CifarNet
-from tfnet.dataset_handler import Dataset
+import tfnet.dataset_handler as dataset
+
+from collections import deque
+
+def calculate_accuracy(network, X, Y):
+	correct_predictions, total = 0, 0
+	for x_batch, y_batch in dataset.batch_one_epoch(X, Y, batch_size=100):
+		correct_predictions += network.correct_predictions(feed_dict={network.x: x_batch, network.y_: y_batch, network.dropout: 1.})
+		total += 100
+	val_accuracy = float(correct_predictions) / total
+	return val_accuracy
 
 def run():	
 	#read untared cifar dataset from folder ./dataset and preprocess images and labels
-	X, Y = cifar_reader.read_and_preprocess()
+	X, Y = cifar_reader.read_and_preprocess('dataset', 'data_batch_1', 'data_batch_2', 'data_batch_3', 'data_batch_4')
+	X_train, X_val, Y_train, Y_val = dataset.split(X, Y, test_size=0.2)
 
-	dataset = Dataset(X, Y, test_size=0.1, val_size=0.2)
+	#dataset = Dataset(X, Y, test_size=0.1, val_size=0.2)
 	del X, Y
 
 	# build convolutional neural network
 	network = CifarNet()
 	n_epochs = 100
-	train_loss_log = []
+	# train_loss_log = deque(maxlen=3)
+	val_acc_log = deque(maxlen=3)
 
 	network.start_session()
-	# uncomment and rewrite filename to load parameters
-	network.load_parameters('saved_models/cifarnet.ckpt-1337')
+	network.load_parameters('saved_models/cifarnet_final.ckpt')
 
-	learning_rate = 0.00001
-	network.set_learning_rate(learning_rate)
-
-	# test accuracy before training
-	correct_predictions, total = 0, 0
-	for x_batch, y_batch in dataset.test_epoch(batch_size=100):
-		correct_predictions += network.correct_predictions(feed_dict={network.x: x_batch, network.y_: y_batch, network.dropout: 1.})
-		total += 100
-	test_accuracy = float(correct_predictions) / total
-	print('\n\ntest accuracy: %f\n\n'%test_accuracy)
+	#learning_rate = 0.1
+	#network.set_learning_rate(learning_rate)
 
 	# start training
-	for epoch in range(n_epochs):		
-
-		if epoch > 0 and epoch % 5 == 0:
+	for epoch in range(n_epochs):
+		print('Epoch %d:'%epoch)
+		if epoch > 0:
 			# test accuracy on validation batch
-			correct_predictions, total = 0, 0
-			for x_batch, y_batch in dataset.validation_epoch(batch_size=100):
-				correct_predictions += network.correct_predictions(feed_dict={network.x: x_batch, network.y_: y_batch, network.dropout: 1.})
-				total += 100
-			val_accuracy = float(correct_predictions) / total
-			print('\n\nvalidation accuracy: %f\n\n'%val_accuracy)
+			val_accuracy = calculate_accuracy(network, X_val, Y_val)
+			val_acc_log.append(val_accuracy)
+			print('validation accuracy: %f'%(val_accuracy))	
+			
+			if len(val_acc_log) == 3:
+				if val_acc_log[2] - val_acc_log[0] < 0.003:
+					# validation score plateauing, stop training
+					break
 
-			print('train acc/loss: %f/%f, val acc/loss: %f/%f'%(train_acc, train_loss_log[-1], val_acc, val_loss))
-			network.save(epoch)
-
-		if len(train_loss_log) > 1:
-			# reduce learning rate if training is plateauing
-			if train_loss_log[-2] - train_loss_log[-1] < train_loss_log[-1]*learning_rate*40:
-				print('setting learning rate from %f to %f.'%(learning_rate, learning_rate/10.))
-				learning_rate = learning_rate/10.
-				network.set_learning_rate(learning_rate)
+			network.save('cifarnet_train')
 
 		accu_loss, accu_acc, n_batches = 0., 0., 0
-		for x_batch, y_batch in dataset.training_epoch(batch_size=128):
+		for x_batch, y_batch in dataset.batch_one_epoch(X_train, Y_train, batch_size=128):
 			x_batch += np.random.normal(x_batch)*0.001
 			# batch update weights
 			batch_loss, batch_acc = network.train_batch(feed_dict={network.x: x_batch, network.y_: y_batch, network.dropout: 0.7})
@@ -64,18 +61,27 @@ def run():
 			accu_acc += batch_acc
 			n_batches += 1
 
-		train_loss_log.append(accu_loss/n_batches)
-		train_acc = accu_acc / n_batches
-		print('training accuracy: %f'%train_acc)
+			if n_batches % 20 == 0:
+				# add summaries
+				x_batch, y_batch = dataset.random_batch(X_train, Y_train, batch_size=256)
+				network.training_summary(feed_dict={network.x: x_batch,
+													network.y_: y_batch, 
+													network.dropout: 1.})
+				x_batch, y_batch = dataset.random_batch(X_val, Y_val, batch_size=256)
+				network.validation_summary(feed_dict={network.x: x_batch,
+													  network.y_: y_batch, 
+													  network.dropout: 1.})
+				train_acc = accu_acc / n_batches
+				train_loss = accu_loss / n_batches
+				print('training loss / accuracy: %f / %f'%(train_loss, train_acc))
 	
-	# test accuracy
-	correct_predictions, total = 0, 0
-	for x_batch, y_batch in dataset.test_epoch(batch_size=100):
-		correct_predictions += network.correct_predictions(feed_dict={network.x: x_batch, network.y_: y_batch, network.dropout: 1.})
-		total += 100
-	test_accuracy = float(correct_predictions) / total
-	print('\n\ntest accuracy: %f\n\n'%test_accuracy)
 
+	# test accuracy
+	X_test, Y_test = cifar_reader.read_and_preprocess('dataset', 'data_batch_5')
+	test_accuracy = calculate_accuracy(network, X_test, Y_test)
+	print('\n\ntest accuracy: %f\n\n'%test_accuracy)
+	
+	network.save('cifarnet_final')
 	network.end_session()
 
 if __name__=='__main__':

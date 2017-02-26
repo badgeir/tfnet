@@ -78,6 +78,14 @@ class NeuralNetwork(object):
 		self.global_step += 1
 		return loss, acc
 
+	def training_summary(self, feed_dict={}):
+		summary = self._session.run(self._summaries, feed_dict=feed_dict)
+		self._summary_train_writer.add_summary(summary)
+
+	def validation_summary(self, feed_dict={}):
+		summary = self._session.run(self._summaries, feed_dict=feed_dict)
+		self._summary_val_writer.add_summary(summary)
+
 	def validate_batch(self, feed_dict={}):
 		loss, acc, summary = self._session.run([self._loss, self._accuracy, self._summaries], feed_dict=feed_dict)
 		self._summary_val_writer.add_summary(summary, global_step=self.global_step)
@@ -95,10 +103,12 @@ class NeuralNetwork(object):
 	def loss(self, feed_dict={}):
 		return self._session.run([self.summaries, self._loss], feed_dict=feed_dict)
 
-	def save(self, step):
+	def save(self, filename=None):
+		if filename is None:
+			filename = self.name
 		cwd = os.getcwd()
-		save_path = os.path.join(cwd, 'saved_models/%s.ckpt'%self.name)
-		_ = self._saver.save(self._session, save_path, global_step=step)
+		save_path = os.path.join(cwd, 'saved_models/%s.ckpt'%filename)
+		_ = self._saver.save(self._session, save_path)
 
 	def network_definition(self):
 		raise NotImplementedError
