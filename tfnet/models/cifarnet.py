@@ -68,7 +68,7 @@ class CifarNet(NeuralNetwork):
     def define_optimizer(self):
         # return tf.train.AdamOptimizer(self._learning_rate)
         #     .minimize(self._loss)
-        return tf.train.AdadeltaOptimizer(learning_rate=0.1)\
+        return tf.train.AdadeltaOptimizer(self._learning_rate)\
             .minimize(self._loss)
         # return tf.train.RMSPropOptimizer(self._learning_rate)\
         #     .minimize(self._loss)

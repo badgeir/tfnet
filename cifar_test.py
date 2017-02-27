@@ -20,7 +20,7 @@ def run():
     network.start_session()
     network.load_parameters('saved_models/cifarnet_final.ckpt')
 
-    X_test, Y_test = cifar_reader.read_and_preprocess('dataset', 'data_batch_5')
+    X_test, Y_test = cifar_reader.read_and_preprocess('data_batch_5', dir='dataset')
     test_accuracy = calculate_accuracy(network, X_test, Y_test)
     print('\n\ntest accuracy: %f\n\n' % test_accuracy)
 
