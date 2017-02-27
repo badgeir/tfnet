@@ -101,9 +101,6 @@ class NeuralNetwork(object):
                                              global_step=self.global_step)
         return loss, acc
 
-    def predict(self, feed_dict={}):
-        return self._session.run(self._network, feed_dict=feed_dict)
-
     def correct_predictions(self, feed_dict={}):
         return self._session.run(self._correct_predictions, feed_dict=feed_dict)
 

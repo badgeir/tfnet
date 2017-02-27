@@ -79,6 +79,10 @@ class CifarNet(NeuralNetwork):
         else:
             print('learning rate can only be assigned in a running session.')
 
+    def predict(self, feed_dict={}):
+        return self._session.run(tf.nn.top_k(tf.nn.softmax(self._network), 3),
+                                 feed_dict=feed_dict)
+
     @property
     def learning_rate(self):
         if self._session_running:

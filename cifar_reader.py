@@ -40,7 +40,7 @@ def preprocess_dataset(X, y):
     Y[np.arange(N_images), y] = 1
 
     # double dataset size by flipping left-right
-    X2 = np.fliplr(X)
+    X2 = np.flip(X, axis=2)
     X = np.concatenate((X, X2), axis=0)
     Y = np.tile(Y, [2, 1])
 
@@ -50,3 +50,4 @@ def preprocess_dataset(X, y):
 def read_and_preprocess(*filenames, dir=''):
     X, Y = read_cifar(dir, filenames)
     return preprocess_dataset(X, Y)
+
