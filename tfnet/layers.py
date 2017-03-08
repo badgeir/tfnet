@@ -16,6 +16,11 @@ def _bias_variable(shape, name, initial=None):
 def _conv2d(x, W):
     return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
 
+def conv2d(x, w_shape, name):
+    W = _weight_variable(w_shape, 'W_%s' % name)
+    b = _bias_variable([w_shape[3]], 'bias_%s' % name)
+    conv = _conv2d(x, W) + b
+    return conv
 
 def max_pool_2x2(x):
     return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],

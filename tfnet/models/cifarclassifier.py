@@ -4,7 +4,7 @@ from tfnet.layers import max_pool_2x2, conv_bn_relu, flatten, fc_bn_relu, dropou
 import tensorflow as tf
 
 
-class CifarNet(NeuralNetwork):
+class CifarClassifier(NeuralNetwork):
 
     def __init__(self):
         x_shape = [None, 32, 32, 3]

@@ -1,5 +1,5 @@
 import cifar_reader
-from tfnet.models import CifarNet
+from tfnet.models import CifarClassifier
 import tfnet.dataset_handler as dataset
 import cifar_results
 
@@ -17,9 +17,9 @@ def calculate_accuracy(network, X, Y):
 
 
 def run():
-    network = CifarNet()
+    network = CifarClassifier()
     network.start_session()
-    network.load_parameters('saved_models/cifarnet_final.ckpt')
+    network.load_parameters('saved_models/cifarnet_train.ckpt')
 
     X_test, Y_test = cifar_reader.read_and_preprocess('data_batch_5', dir='dataset')
     test_accuracy = calculate_accuracy(network, X_test, Y_test)

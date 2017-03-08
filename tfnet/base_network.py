@@ -24,15 +24,9 @@ class NeuralNetwork(object):
 
         self._saver = None
 
-        self._summaries
-        self._summary_train_writer
-        self._summary_val_writer
-
-        self.global_step = 0
-
     def _build_network(self):
         try:
-            self._network = self.define_hyperparams()
+            self.define_hyperparams()
         except NotImplementedError as e:
             print('Warning: define_hyperparams() is not implemented, using default params')
         try:
@@ -48,24 +42,10 @@ class NeuralNetwork(object):
         except NotImplementedError as e:
             print('Error: optimizer_definition() is not implemented.')
 
-        correct_prediction = tf.equal(tf.argmax(self._network, 1),
-                                      tf.argmax(self.y_, 1))
-        self._accuracy = tf.reduce_mean(tf.cast(correct_prediction,
-                                                tf.float32))
-        self._correct_predictions = tf.reduce_sum(tf.cast(correct_prediction,
-                                                  tf.int32))
-        # tensorboard summaries
-        tf.summary.scalar('loss', self._loss)
-        tf.summary.scalar('accuracy', self._accuracy)
-        self._summary_train_writer = tf.summary.FileWriter('logdir/train')
-        self._summary_val_writer = tf.summary.FileWriter('logdir/validation')
-        self._summaries = tf.summary.merge_all()
-
     def start_session(self):
         self._saver = tf.train.Saver()
         self._session = tf.Session()
         self._session_running = True
-
         self._session.run(tf.global_variables_initializer())
 
     def load_parameters(self, path):
@@ -76,40 +56,16 @@ class NeuralNetwork(object):
         self._session_running = False
 
     def train_batch(self, feed_dict={}):
-        _, loss, acc, summary = self._session.run([self._optimizer,
-                                                   self._loss, self._accuracy,
-                                                   self._summaries],
-                                                  feed_dict=feed_dict)
-        self._summary_train_writer.add_summary(summary,
-                                               global_step=self.global_step)
-        self.global_step += 1
-        return loss, acc
+        _, loss = self._session.run([self._optimizer,
+                                     self._loss],
+                                     feed_dict=feed_dict)
+        return loss
 
-    def training_summary(self, feed_dict={}):
-        summary = self._session.run(self._summaries, feed_dict=feed_dict)
-        self._summary_train_writer.add_summary(summary)
-
-    def validation_summary(self, feed_dict={}):
-        summary = self._session.run(self._summaries, feed_dict=feed_dict)
-        self._summary_val_writer.add_summary(summary)
-
-    def validate_batch(self, feed_dict={}):
-        loss, acc, summary = self._session.run([self._loss, self._accuracy,
-                                                self._summaries],
-                                               feed_dict=feed_dict)
-        self._summary_val_writer.add_summary(summary,
-                                             global_step=self.global_step)
-        return loss, acc
-
-    def correct_predictions(self, feed_dict={}):
-        return self._session.run(self._correct_predictions, feed_dict=feed_dict)
-
-    def accuracy(self, feed_dict={}):
-        return self._session.run(self._accuracy, feed_dict=feed_dict)
+    def output(self, feed_dict={}):
+        return self._session.run(self._network, feed_dict=feed_dict)
 
     def loss(self, feed_dict={}):
-        return self._session.run([self.summaries, self._loss],
-                                 feed_dict=feed_dict)
+        return self._session.run(self._loss, feed_dict=feed_dict)
 
     def save(self, filename=None):
         if filename is None:

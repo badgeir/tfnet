@@ -2,7 +2,7 @@ from collections import deque
 import numpy as np
 
 import cifar_reader
-from tfnet.models import CifarNet
+from tfnet.models import CifarClassifier
 import tfnet.dataset_handler as dataset
 
 
@@ -30,7 +30,7 @@ def run():
     del X, Y
 
     # build convolutional neural network
-    network = CifarNet()
+    network = CifarClassifier()
     n_epochs = 100
 
     train_loss_log = deque(maxlen=3)
