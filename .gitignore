@@ -7,3 +7,4 @@ saved_models
 logdir
 __pycache__
 *.json
+*.gz
