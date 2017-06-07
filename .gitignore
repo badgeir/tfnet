@@ -8,3 +8,6 @@ logdir
 __pycache__
 *.json
 *.gz
+build
+tfnet.egg-info
+dist
