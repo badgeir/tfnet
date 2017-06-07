@@ -15,14 +15,6 @@ class ColorNet(NeuralNetwork):
         self.dropout = tf.placeholder(tf.float32, name='dropout')
 
     def define_network(self):
-        #conv_1 = tf.nn.relu(conv2d(self.x, [5, 5, 1, 64], 'C1'))
-        #conv_2 = tf.nn.relu(conv2d(conv_1, [5, 5, 64, 64], 'C2'))
-        #drop_2 = dropout(conv_2, self.dropout)
-        #conv_3 = tf.nn.relu(conv2d(drop_2, [5, 5, 64, 64], 'C1'))
-        #conv_4 = tf.nn.relu(conv2d(conv_3, [5, 5, 64, 64], 'C2'))
-        #drop_4 = dropout(conv_4, self.dropout)
-        #output = tf.nn.sigmoid(conv2d(drop_4, [5, 5, 64, 3], 'output'))
-
         conv_1 = tf.nn.relu(conv2d(self.x, [3, 3, 1, 64], 'C1'))
         conv_2 = tf.nn.relu(conv2d(conv_1, [3, 3, 64, 64], 'C2'))
         conv_3 = tf.nn.relu(conv2d(conv_2, [3, 3, 64, 64], 'C3'))
@@ -36,7 +28,6 @@ class ColorNet(NeuralNetwork):
         conv_9 = tf.nn.relu(conv2d(conv_8, [3, 3, 256, 256], 'C9'))
         drop_9 = dropout(conv_9, self.dropout)
         output = tf.nn.sigmoid(conv2d(drop_9, [3, 3, 256, 3], 'output'))
-
         return output
 
     def define_loss(self):
@@ -49,12 +40,8 @@ class ColorNet(NeuralNetwork):
         return loss
 
     def define_optimizer(self):
-        # return tf.train.AdamOptimizer(self._learning_rate)
-        #     .minimize(self._loss)
         return tf.train.AdadeltaOptimizer(1.)\
             .minimize(self._loss)
-        # return tf.train.RMSPropOptimizer(self._learning_rate)\
-        #     .minimize(self._loss)
 
     def set_learning_rate(self, lr):
         if self._session_running:
