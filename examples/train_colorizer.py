@@ -7,9 +7,8 @@ import tfnet.dataset_handler as dataset
 
 from matplotlib import pyplot as plt
 
+
 def run():
-    # read untared cifar dataset from folder ./dataset
-    # and preprocess images and labels:
     X, Y = cifar_reader.read_and_preprocess('data_batch_1',
                                             'data_batch_2',
                                             'data_batch_3',
@@ -24,17 +23,6 @@ def run():
 
     X_train = X_train.mean(axis=3)[:, :, :, None]
     X_val = X_val.mean(axis=3)[:, :, :, None]
-
-    #fig = plt.figure()
-    #fig.add_subplot(2, 2, 1)
-    #plt.imshow(X_train[0])
-    #fig.add_subplot(2, 2, 2)
-    #plt.imshow(X_train[1])
-    #fig.add_subplot(2, 2, 3)
-    #plt.imshow(Y_train[0])
-    #fig.add_subplot(2, 2, 4)
-    #plt.imshow(Y_train[1])
-    #plt.show()
 
     network = ColorNet()
     n_epochs = 100
@@ -63,17 +51,6 @@ def run():
                 print('validation loss: ', val_loss)
         x_batch, y_batch = dataset.random_batch(X_train, Y_train, batch_size=2)
         outputs = network.output(feed_dict={network.x: x_batch, network.dropout: 1.})
-
-        fig = plt.figure()
-        fig.add_subplot(2, 2, 1)
-        plt.imshow(x_batch[0].squeeze(), cmap='gray')
-        fig.add_subplot(2, 2, 2)
-        plt.imshow(x_batch[1].squeeze(), cmap='gray')
-        fig.add_subplot(2, 2, 3)
-        plt.imshow(outputs[0])
-        fig.add_subplot(2, 2, 4)
-        plt.imshow(outputs[1])
-        plt.show()
 
         x_batch, y_batch = dataset.random_batch(X_val, Y_val, batch_size=4)
         outputs = network.output(feed_dict={network.x: x_batch, network.dropout: 1.})
