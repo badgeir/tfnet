@@ -11,3 +11,4 @@ __pycache__
 build
 tfnet.egg-info
 dist
+*.tsv

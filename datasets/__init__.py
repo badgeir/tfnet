@@ -1,1 +1,1 @@
-from datasets import mnist
+from datasets import mnist, rotten_reviews
