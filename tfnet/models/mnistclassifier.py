@@ -13,7 +13,7 @@ class MnistClassifier(NeuralNetwork):
 
     def define_hyperparams(self):
         self.dropout = tf.placeholder(tf.float32, name='dropout')
-        self._learning_rate = tf.Variable(1e-3, trainable=False)
+        self._learning_rate = tf.Variable(1., trainable=False)
 
     def define_network(self):
         conv_1 = tf.nn.relu(conv2d(self.x, [5, 5, 1, 32], 'C_1'))

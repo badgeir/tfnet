@@ -4,7 +4,7 @@ import numpy as np
 
 
 def load():
-    f = gzip.open(r'datasets\mnist\mnist.pkl.gz', 'rb')
+    f = gzip.open(r'tfnet\datasets\mnist\mnist.pkl.gz', 'rb')
     u = pickle._Unpickler(f)
     u.encoding = 'latin1'
     train_set, valid_set, test_set = u.load()

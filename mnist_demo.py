@@ -2,7 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from tfnet.models import MnistClassifier
 import tfnet.dataset_handler as dataset
-import tfnet.datasets.mnist as mnist
+from tfnet.datasets import mnist
 
 
 X_train, Y_train, X_val, Y_val, X_test, Y_test = mnist.load()

@@ -12,5 +12,5 @@ setup(name='tfnet',
       author_email='pleupi123@gmail.com',
       license='MIT',
       packages=[package for package in find_packages()
-                if package.startswith('tfnet')],
-)
+                if package.startswith('tfnet')]
+      )
