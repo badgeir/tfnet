@@ -1,5 +1,4 @@
 import numpy as np
-from matplotlib import pyplot as plt
 from tfnet.models import MnistClassifier
 import tfnet.dataset_handler as dataset
 import tfnet.datasets.mnist as mnist
