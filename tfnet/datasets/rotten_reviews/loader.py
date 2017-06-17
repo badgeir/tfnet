@@ -4,7 +4,7 @@ from tfnet.dataset_handler import split
 
 
 def load():
-    with zipfile.ZipFile('train.tsv.zip', 'r') as f:
+    with zipfile.ZipFile('tfnet/datasets/rotten_reviews/train.tsv.zip', 'r') as f:
         f.extractall()
     with open('train.tsv', 'r') as f:
         train = f.readlines()
